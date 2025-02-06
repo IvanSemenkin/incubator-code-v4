@@ -148,9 +148,6 @@ textarea::-webkit-resizer {
   li { 
     width: 40%;
   }
-  body {
-    overflow: hidden;
-  }
   .theme-switcher {
     position: fixed;
     top: 20px;
