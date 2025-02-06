@@ -160,6 +160,39 @@ def save_settings(mode):
     file.write(json.dumps({'mode': mode}))
     file.close()
     
+
+async def tray_rotator():
+    if mode == 1:
+        while True:
+            motor.value(1)
+            await uasyncio.sleep(rotate_time) 
+            motor.value(0)
+            await uasyncio.sleep(2160) 
+    elif mode == 2:
+        while True:
+            motor.value(1)
+            await uasyncio.sleep(rotate_time) 
+            motor.value(0)
+            await uasyncio.sleep(14400)
+    elif mode == 3:
+        motor.value(0)
+        
+async def cooling():
+    global cooling_mode 
+    fan.value(1)
+    cooling_mode = True
+    await uasyncio.sleep(20)
+    fan.value(0)
+    cooling_mode = False
+    if mode == 2:
+        while True:
+            await uasyncio.sleep(7200)
+            fan.value(1)
+            cooling_mode = True
+            await uasyncio.sleep(900)
+            fan.value(0)
+            cooling_mode = False
+
 async def thermostat():
     global temperature, humidity, mode, ip_addr
     start_time = time.time()
@@ -209,6 +242,7 @@ led = Pin(2, Pin.OUT)
 sensor = dht.DHT22(Pin(14))
 heater = Pin(13, Pin.OUT)
 fan = Pin(12, Pin.OUT)
+motor = Pin(18, Pin.OUT)
 display = ssd1306.SSD1306_I2C(128, 64, I2C(sda=Pin(23), scl=Pin(22)))
 
 mode = 1
@@ -216,6 +250,12 @@ target_temperature = 37.8
 target_humidity = 53
 delta_temperature = .3
 delta_humidity = 3
+rotate_time = 10
+
+seven_days1 = 10
+forteen_days1 = 20
+seven_days = 7*24*60*60
+forteen_days = 14*24*60*60
 
 humidity = 0
 temperature = 0
@@ -236,6 +276,8 @@ loop = uasyncio.get_event_loop()
 loop.create_task(init_network())
 loop.create_task(app.run())
 loop.create_task(thermostat())
+loop.create_task(tray_rotator())
+loop.create_task(cooling())
 try:
     loop.run_forever()
 finally:
