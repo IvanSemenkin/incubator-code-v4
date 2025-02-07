@@ -85,6 +85,14 @@ async def css(req):
 async def css(req):
     return send_file('/static/js/main.js')
 
+@app.get('/qr-code')
+async def css(req):
+    return send_file('/static/img/qr-code.png')
+
+@app.get('/github-icon')
+async def css(req):
+    return send_file('/static/img/git-hub-img.svg')
+
 
     
 # Методы (def)

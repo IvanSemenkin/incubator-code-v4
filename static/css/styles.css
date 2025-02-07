@@ -45,7 +45,7 @@
 
 body {
   font-family: Arial, sans-serif;
-  background-color: #f0f0f0;
+  /* background-color: #f0f0f0; */
   color: #333;
   transition: background-color 0.3s, color 0.3s;
 }
@@ -113,7 +113,7 @@ span {
   padding-left: 20px;
 }
 
-.active-button{
+.active-button {
   background-color: #fff;
   color: #6a5acd;
   border: none;
@@ -135,7 +135,7 @@ textarea {
   width: 100px;
   height: 70px;
 }
-textarea:hover{
+textarea:hover {
   background-color: #8b76ff;
   color: #fff;
 }
@@ -143,22 +143,70 @@ textarea:hover{
 textarea::-webkit-resizer {
   display: none;
 }
+.git-hub-img {
+  display: none;
+}
 
-@media only screen and (max-width: 600px) {
-  li { 
-    width: 40%;
+#qr-code {
+  display: block;
+  position: fixed;
+  bottom: 50px;
+  scale: 130%;
+  transition: 0.4s ease;
+}
+
+#qr-code:hover {
+  scale: 140%;
+}
+
+@media (max-width: 768px) {
+  .fancy-list {
+    width: 90%;
+    margin-top: 50px;
   }
+
+  .fancy-list li {
+    font-size: 1rem;
+    padding: 10px 15px;
+    margin: 5px;
+  }
+
+  .list-button {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    margin: 3px;
+  }
+
   .theme-switcher {
-    position: fixed;
-    top: 20px;
-    right: auto;
-    left: auto;
-    z-index: 10;
+    bottom: 10px;
+    right: 10px;
   }
-  body {
-    height: 100%;
-    width: 100%;
-    overflow: hidden;
+
+  .theme-button {
+    padding: 8px 15px;
+    font-size: 0.9rem;
+  }
+
+  textarea {
+    width: 90%;
+    height: 50px;
+    font-size: 0.9rem;
+  }
+
+  span {
+    font-size: 1.2rem;
+    padding-left: 10px;
+  }
+  #qr-code {
+    display: none;
+  }
+  .git-hub-img {
     position: fixed;
+    display: block;
+    bottom: 1px;
+  }
+
+  li {
+    margin: 10px;
   }
 }
