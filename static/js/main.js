@@ -45,28 +45,17 @@ function clearDots() {
   dotsContainer.innerHTML = '';
 }
 
-function modeChange() {
-  console.log('click');
-  console.log(mode.value);
-  
-  if (mode.value == '1') {
-    modeButtonFirst.className = 'active-button';
-    modeButtonSecond.className = 'list-button';
-    modeButtonTherd.className = 'list-button';
-    spanMode.textContent = 1
-  }if (mode.value == '2') {
-    modeButtonFirst.className = 'list-button';
-    modeButtonSecond.className = 'active-button';
-    modeButtonTherd.className = 'list-button';
-    spanMode.textContent = 2
-  }if (mode.value == '3') {
-    modeButtonFirst.className = 'list-button';
-    modeButtonSecond.className = 'list-button';
-    modeButtonTherd.className = 'active-button';
-    spanMode.textContent = 3
-  } 
-  mode.value = ''
-
-}
-
-
+if (mode.textContent == '1') {
+  modeButtonFirst.className = 'active-button';
+  modeButtonSecond.className = 'list-button';
+  modeButtonTherd.className = 'list-button';
+}if (mode.textContent == '2') {
+  modeButtonFirst.className = 'list-button';
+  modeButtonSecond.className = 'active-button';
+  modeButtonTherd.className = 'list-button';
+}if (mode.textContent == 3) {
+  modeButtonFirst.className = 'list-button';
+  modeButtonSecond.className = 'list-button';
+  modeButtonTherd.className = 'active-button';
+} 
+mode.value = ''

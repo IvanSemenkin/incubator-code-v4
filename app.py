@@ -14,6 +14,9 @@ import ssd1306
 import json
 import time
 import os
+
+app = Microdot()
+
 def init():
     global mode, display, f, line
 #    os.dupterm(log_a)
@@ -61,36 +64,27 @@ async def init_network():
 
 Response.default_content_type = 'text/html'
 
-app = Microdot()
-
-temp = "23"
+temp = "1"
 
 @app.get('/')
 async def index(req):
-    return Template('index.html').render(temp=temp)
+    return Template('index.html').render(temp=sensor.temperature(), hum=humidity, mode=mode)
 
-@app.get('/settings')
-async def settings(req):
-    return Template('settings.html').render()
-
-@app.get('/inf')
-async def inf(req):
-    return Template('inf.html').render()
 
 @app.get('/css')
 async def css(req):
     return send_file('/static/css/styles.css')
 
 @app.get('/js')
-async def css(req):
+async def js(req):
     return send_file('/static/js/main.js')
 
 @app.get('/qr-code')
-async def css(req):
+async def qrCode(req):
     return send_file('/static/img/qr-code.png')
 
 @app.get('/github-icon')
-async def css(req):
+async def githubIcon(req):
     return send_file('/static/img/git-hub-img.svg')
 
 
@@ -99,8 +93,6 @@ async def css(req):
 @app.route("/heater_on")
 def heater_on(request):
     heater.value(1)
-    await request.write("HTTP/1.0 302 OK\r\n")
-    await request.write('Location: /settings\r\n')
     
 @app.route("/inf1")
 def inf1(request):
@@ -109,43 +101,30 @@ def inf1(request):
     
 @app.route("/heater_off")
 def heater_off(request):
-    heater.czdsxxvalue(0)
-    await request.write("HTTP/1.0 302 OK\r\n")
-    await request.write('Location: /settings\r\n')
+    heater.value(0)
     
 @app.route("/fan_on")
 def fan_on(request):
     fan.value(1)
-    await request.write("HTTP/1.0 302 OK\r\n")
-    await request.write('Location: /settings\r\n')
     
 @app.route("/fan_off")
 def fan_off(request):
     fan.value(0)
-    await request.write("HTTP/1.0 302 OK\r\n")
-    await request.write('Location: /settings\r\n')
     
 @app.route("/mode_1")    
 def mode_1(request):
     set_mode(1)
     save_settings(mode)
-    
-    await request.write("HTTP/1.0 302 OK\r\n")
-    await request.write('Location: /settings\r\n')    
 
 @app.route("/mode_2")    
 def mode_2(request):
     set_mode(2)
     save_settings(mode)
-    await request.write("HTTP/1.0 302 OK\r\n")
-    await request.write('Location: /settings\r\n')
     
 @app.route("/mode_3")    
 def mode_3(request):
     set_mode(3)
     save_settings(mode)
-    await request.write("HTTP/1.0 302 OK\r\n")
-    await request.write('Location: /settings\r\n')
 
 def set_mode(new_mode):
     global mode, target_temperature, target_humidity
@@ -203,35 +182,28 @@ async def cooling():
 
 async def thermostat():
     global temperature, humidity, mode, ip_addr
+    print("thermostat is running")
     start_time = time.time()
     while True:
-        sensor.measure()
-        temperature = sensor.temperature()
-        humidity = sensor.humidity()
-        if temperature >= target_temperature:
-            heater.value(0)
-        elif temperature < target_temperature:
-            heater.value(1)
-            
-    
-        #print(0 - (start_time - time.time()), "\t", temperature)
-            
-        if humidity > target_humidity + delta_humidity:
-            fan.value(1)
-        elif humidity < target_humidity - delta_humidity:
-            fan.value(0)
-# Перегрев
-#         if temperature > 39:
-#             fan.value(1)
-#             display.text('Overheat fan ON!!!', 0, 0, 1)
-#         elif temperature < 38.5:
-#             fan.value(0)
-#             display.fill_rect(0, 0, 128, 11, 0)
-            
-#         if temperature < 38:
-#             display.text('Undercooling!!!', 0, 0, 1)
-#         elif temperature > 37.2:
-#             display.fill_rect(0, 0, 128, 11, 0)
+        if not cooling_mode:  
+            try:
+                sensor.measure()
+                temperature = sensor.temperature()
+                humidity = sensor.humidity()
+                print(temperature, humidity)
+            except:
+                sensor.measure()
+                temperature = sensor.temperature()
+                humidity = sensor.humidity()
+                print("Ошибка датчика")
+            if temperature >= target_temperature:
+                heater.value(0)
+            elif temperature < target_temperature:
+                heater.value(1)
+            if humidity > target_humidity + delta_humidity:
+                fan.value(1)
+            elif humidity < target_humidity - delta_humidity:
+                fan.value(0)
         
         led.value(not led.value())
         on_off_dict = {1: "ON", 0: "OFF"}
@@ -247,9 +219,10 @@ async def thermostat():
 
 
 led = Pin(2, Pin.OUT)
-sensor = dht.DHT22(Pin(14))
-heater = Pin(13, Pin.OUT)
-fan = Pin(12, Pin.OUT)
+sensor = dht.DHT22(Pin(25))
+print(sensor.temperature())
+heater = Pin(27, Pin.OUT)
+fan = Pin(26, Pin.OUT)
 motor = Pin(18, Pin.OUT)
 display = ssd1306.SSD1306_I2C(128, 64, I2C(sda=Pin(23), scl=Pin(22)))
 
@@ -282,10 +255,11 @@ init()
 
 loop = uasyncio.get_event_loop()
 loop.create_task(init_network())
-loop.create_task(app.run())
+loop.create_task(app.start_server())
+loop.create_task(cooling())
 loop.create_task(thermostat())
 loop.create_task(tray_rotator())
-loop.create_task(cooling())
+
 try:
     loop.run_forever()
 finally:
