@@ -39,7 +39,7 @@ def init():
     display.fill(0)
 
 async def init_network():
-    global ip_addr, mode
+    global ip_addr, mode, ssid
     
     ssid = 'HIPPO'
     password = '8abcdef892'
@@ -306,10 +306,12 @@ init()
 loop = uasyncio.get_event_loop()
 loop.create_task(init_network())
 loop.create_task(app.start_server())
-loop.create_task(cooling())
-# loop.create_task(thermostat())
-loop.create_task(demo())
-loop.create_task(tray_rotator())
+if ssid == "Incubator-demo":
+    loop.create_task(demo())
+else:
+    loop.create_task(thermostat())
+    loop.create_task(tray_rotator())
+    loop.create_task(cooling())
 
 try:
     loop.run_forever()
