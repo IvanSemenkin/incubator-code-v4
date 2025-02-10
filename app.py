@@ -68,7 +68,7 @@ temp = "1"
 
 @app.get('/')
 async def index(req):
-    return Template('index.html').render(temp=sensor.temperature(), hum=humidity, mode=mode)
+    return Template('index.html').render(temp=sensor.temperature(), hum=humidity, mode=mode, on_off_motor=on_off_dict[motor.value()])
 
 
 @app.get('/css')
@@ -94,10 +94,10 @@ async def githubIcon(req):
 def heater_on(request):
     heater.value(1)
     
-@app.route("/inf1")
-def inf1(request):
-    await request.write("HTTP/1.0 302 OK\r\n")
-    await request.write('Location: https://fermerznaet.com/pticevodstvo/perepela/inkubaciya.html#m5')
+# @app.route("/inf1")
+# def inf1(request):
+#     await request.write("HTTP/1.0 302 OK\r\n")
+#     await request.write('Location: https://fermerznaet.com/pticevodstvo/perepela/inkubaciya.html#m5')
     
 @app.route("/heater_off")
 def heater_off(request):
@@ -125,6 +125,14 @@ def mode_2(request):
 def mode_3(request):
     set_mode(3)
     save_settings(mode)
+
+@app.route("/motor_on")
+def fan_off(request):
+    motor.value(1)
+
+@app.route("/motor_off")
+def fan_off(request):
+    motor.value(0)
 
 def set_mode(new_mode):
     global mode, target_temperature, target_humidity
@@ -179,6 +187,48 @@ async def cooling():
             await uasyncio.sleep(900)
             fan.value(0)
             cooling_mode = False
+
+async def demo():
+    while True:
+        heater.value(1)
+        await uasyncio.sleep(60)
+        heater.value(0)
+        await uasyncio.sleep(30)
+
+        motor.value(1)
+        await uasyncio.sleep(30)
+        motor.value(0)
+        await uasyncio.sleep(30)
+
+        fan.value(1)
+        await uasyncio.sleep(30)
+        fan.value(0)
+        await uasyncio.sleep(30)
+
+        global temperature, humidity, mode, ip_addr
+        print("thermostat demo is running")
+        try:
+            sensor.measure()
+            temperature = sensor.temperature()
+            humidity = sensor.humidity()
+            print(temperature, humidity)
+        except:
+                sensor.measure()
+                temperature = sensor.temperature()
+                humidity = sensor.humidity()
+                print("Ошибка датчика")
+        led.value(not led.value())
+        on_off_dict = {1: "ON", 0: "OFF"}
+        display.fill_rect(0, 12, 128, 64, 0) 
+        display.text('Heat: {heat}, {temp}C'.format(heat = on_off_dict[heater.value()], temp = temperature), 0, 16, 1)
+        display.text('Fan: {fan}, {hum}%'.format(fan = on_off_dict[fan.value()], hum = humidity), 0, 28, 1)
+        display.text('M{mode}: {temp}C, {hum}%'.format(mode = mode, temp = target_temperature, hum = target_humidity) , 0, 40, 1)
+        display.text(ip_addr, 0, 52, 1)
+
+        display.show()        
+        await uasyncio.sleep(2)     
+
+
 
 async def thermostat():
     global temperature, humidity, mode, ip_addr
@@ -257,7 +307,8 @@ loop = uasyncio.get_event_loop()
 loop.create_task(init_network())
 loop.create_task(app.start_server())
 loop.create_task(cooling())
-loop.create_task(thermostat())
+# loop.create_task(thermostat())
+loop.create_task(demo())
 loop.create_task(tray_rotator())
 
 try:

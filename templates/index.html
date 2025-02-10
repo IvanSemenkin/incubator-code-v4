@@ -1,10 +1,9 @@
-{% args temp, hum, mode %}
+{% args temp, hum, mode, on_off_motor %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="refresh" content="2">
     <title>1</title>
     <link rel="stylesheet" href="/css" />
     <script src="/js" defer></script>
@@ -37,9 +36,9 @@
         </li>
         <li>
           Переворот яиц
-          <a href="#"><button class="list-button">Включить</button></a>
-          <a href="#"><button class="list-button">Выключить</button></a>
-          <span>Вкл</span>
+          <a href="/motor_on"><button class="list-button">Включить</button></a>
+          <a href="/motor_off"><button class="list-button">Выключить</button></a>
+          <span>{{ on_off_motor }}</span>
         </li>
       </ul>
       <a href="https://github.com/IvanSemenkin/incubator-code-v4" target="_blank"><img id="qr-code" src="/qr-code" width="164" height="164" border="0" title="QR код"></a>
