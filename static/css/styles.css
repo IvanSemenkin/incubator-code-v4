@@ -151,6 +151,7 @@ textarea::-webkit-resizer {
   display: block;
   position: fixed;
   bottom: 50px;
+  left: 100px;
   scale: 130%;
   transition: 0.4s ease;
 }

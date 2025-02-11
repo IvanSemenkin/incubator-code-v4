@@ -59,3 +59,9 @@ if (mode.textContent == '1') {
   modeButtonTherd.className = 'active-button';
 } 
 mode.value = ''
+
+while (True) {
+  setTimeout(() => {
+    location.reload();
+  }, 2000);
+}

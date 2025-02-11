@@ -14,14 +14,22 @@ import ssd1306
 import json
 import time
 import os
+import io
 
 app = Microdot()
 
 def init():
     global mode, display, f, line
-#    os.dupterm(log_a)
-#     for line in log_r:
-#         l = l + line 
+    class logToFile(io.IOBase):
+        def __init__(self):
+            pass
+
+        def write(self, data):
+            with open("log.txt", mode="a") as f:
+                f.write(data)
+            return len(data)
+    # Begin loging to file
+    os.dupterm(logToFile())
     
     
         
@@ -48,19 +56,17 @@ async def init_network():
     wlan = network.WLAN(network.STA_IF)
     wlan.active(True)
     wlan.disconnect()
-    ip_addr = wlan.ifconfig()[0]
-    print('Подключено к Wi-Fi. IP-адрес:', ip_addr, ':5000')
     if not wlan.isconnected():
         wlan.connect(ssid, password)
         print("Waiting for connection...")
         display.fill_rect(0, 0, 128, 11, 0)
         display.text('Connecting...', 0, 0, 1)
         while not wlan.isconnected():
-            await uasyncio.sleep(1)
-
-    print("Connected... IP: " + ip_addr)
-    display.fill_rect(0, 0, 128, 11, 0) 
-
+            await uasyncio.sleep(3)
+            
+    ip_addr = wlan.ifconfig()[0]
+    print('Подключено к Wi-Fi. Веб-интерфейс: http://' + ip_addr + ':5000')
+    display.fill_rect(0, 0, 128, 11, 0)
 
 Response.default_content_type = 'text/html'
 
@@ -157,27 +163,32 @@ def save_settings(mode):
     
 
 async def tray_rotator():
-    if mode == 1:
-        while True:
-            motor.value(1)
-            await uasyncio.sleep(rotate_time) 
-            motor.value(0)
-            await uasyncio.sleep(2160) 
-    elif mode == 2:
-        while True:
-            motor.value(1)
-            await uasyncio.sleep(rotate_time) 
-            motor.value(0)
-            await uasyncio.sleep(14400)
-    elif mode == 3:
+    while True:
+        motor.value(1)
+        await uasyncio.sleep(60) 
         motor.value(0)
+        await uasyncio.sleep(60)
+#     if mode == 1:
+#         while True:
+#             motor.value(1)
+#             await uasyncio.sleep(rotate_time) 
+#             motor.value(0)
+#             await uasyncio.sleep(2160) 
+#     elif mode == 2:
+#         while True:
+#             motor.value(1)
+#             await uasyncio.sleep(rotate_time) 
+#             motor.value(0)
+#             await uasyncio.sleep(14400)
+#     elif mode == 3:
+#         motor.value(0)
         
 async def cooling():
     global cooling_mode 
-    fan.value(1)
-    cooling_mode = True
-    await uasyncio.sleep(20)
-    fan.value(0)
+#     fan.value(1)
+#     cooling_mode = True
+#     await uasyncio.sleep(20)
+#     fan.value(0)
     cooling_mode = False
     if mode == 2:
         while True:
@@ -187,47 +198,6 @@ async def cooling():
             await uasyncio.sleep(900)
             fan.value(0)
             cooling_mode = False
-
-async def demo():
-    while True:
-        heater.value(1)
-        await uasyncio.sleep(60)
-        heater.value(0)
-        await uasyncio.sleep(30)
-
-        motor.value(1)
-        await uasyncio.sleep(30)
-        motor.value(0)
-        await uasyncio.sleep(30)
-
-        fan.value(1)
-        await uasyncio.sleep(30)
-        fan.value(0)
-        await uasyncio.sleep(30)
-
-        global temperature, humidity, mode, ip_addr
-        print("thermostat demo is running")
-        try:
-            sensor.measure()
-            temperature = sensor.temperature()
-            humidity = sensor.humidity()
-            print(temperature, humidity)
-        except:
-                sensor.measure()
-                temperature = sensor.temperature()
-                humidity = sensor.humidity()
-                print("Ошибка датчика")
-        led.value(not led.value())
-        on_off_dict = {1: "ON", 0: "OFF"}
-        display.fill_rect(0, 12, 128, 64, 0) 
-        display.text('Heat: {heat}, {temp}C'.format(heat = on_off_dict[heater.value()], temp = temperature), 0, 16, 1)
-        display.text('Fan: {fan}, {hum}%'.format(fan = on_off_dict[fan.value()], hum = humidity), 0, 28, 1)
-        display.text('M{mode}: {temp}C, {hum}%'.format(mode = mode, temp = target_temperature, hum = target_humidity) , 0, 40, 1)
-        display.text(ip_addr, 0, 52, 1)
-
-        display.show()        
-        await uasyncio.sleep(2)     
-
 
 
 async def thermostat():
@@ -240,7 +210,6 @@ async def thermostat():
                 sensor.measure()
                 temperature = sensor.temperature()
                 humidity = sensor.humidity()
-                print(temperature, humidity)
             except:
                 sensor.measure()
                 temperature = sensor.temperature()
@@ -254,21 +223,22 @@ async def thermostat():
                 fan.value(1)
             elif humidity < target_humidity - delta_humidity:
                 fan.value(0)
-        
-        led.value(not led.value())
-        on_off_dict = {1: "ON", 0: "OFF"}
-        display.fill_rect(0, 12, 128, 64, 0) 
-        display.text('Heat: {heat}, {temp}C'.format(heat = on_off_dict[heater.value()], temp = temperature), 0, 16, 1)
-        display.text('Fan: {fan}, {hum}%'.format(fan = on_off_dict[fan.value()], hum = humidity), 0, 28, 1)
-        display.text('M{mode}: {temp}C, {hum}%'.format(mode = mode, temp = target_temperature, hum = target_humidity) , 0, 40, 1)
-        display.text(ip_addr, 0, 52, 1)
-
-        display.show()        
-        await uasyncio.sleep(2)                
+            print(humidity, "- hum")
+            led.value(not led.value())
+            on_off_dict = {1: "ON", 0: "OFF"}
+            display.fill_rect(0, 12, 128, 64, 0) 
+            display.text('Heat: {heat}, {temp}C'.format(heat = on_off_dict[heater.value()], temp = temperature), 0, 16, 1)
+            display.text('Fan: {fan}, {hum}%'.format(fan = on_off_dict[fan.value()], hum = humidity), 0, 28, 1)
+            display.text('M{mode}: {temp}C, {hum}%'.format(mode = mode, temp = target_temperature, hum = target_humidity) , 0, 40, 1)
+            
+            display.text(ip_addr, 0, 52, 1)
+            display.show()        
+            await uasyncio.sleep(2)                
 
 
 
 led = Pin(2, Pin.OUT)
+ssid = "HIPPO"
 sensor = dht.DHT22(Pin(25))
 print(sensor.temperature())
 heater = Pin(27, Pin.OUT)
@@ -306,18 +276,13 @@ init()
 loop = uasyncio.get_event_loop()
 loop.create_task(init_network())
 loop.create_task(app.start_server())
-if ssid == "Incubator-demo":
-    loop.create_task(demo())
-else:
-    loop.create_task(thermostat())
-    loop.create_task(tray_rotator())
-    loop.create_task(cooling())
+loop.create_task(cooling())
+loop.create_task(thermostat())
+loop.create_task(tray_rotator())
 
 try:
     loop.run_forever()
 finally:
-    
-    log_r.close()
-
+    pass
 
 
