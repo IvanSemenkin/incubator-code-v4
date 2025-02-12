@@ -159,6 +159,13 @@ textarea::-webkit-resizer {
   scale: 140%;
 }
 
+.img_chick {
+  scale: 60%;
+  position: absolute;
+  bottom: 300px;
+  left: 10px;
+}
+
 @media (max-width: 768px) {
   .fancy-list {
     width: 90%;
