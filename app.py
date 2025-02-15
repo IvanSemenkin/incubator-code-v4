@@ -259,13 +259,18 @@ async def thermostat():
             display.text('Fan: {fan}, {hum}%'.format(fan = on_off_dict[fan.value()], hum = humidity), 0, 28, 1)
             display.text('M{mode}: {temp}C, {hum}%'.format(mode = mode, temp = target_temperature, hum = target_humidity) , 0, 40, 1)
             display.text(ip_addr, 0, 52, 1)
-            
+            display.pixel(0, 0, 1)
             try:
                 display.show()
             except:
                 log('display error')
                 
             await uasyncio.sleep(2)
+            display.pixel(0, 0, 0)
+            try:
+                display.show()
+            except:
+                log('display error')
 
 
 
