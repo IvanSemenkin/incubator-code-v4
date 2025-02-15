@@ -15,6 +15,7 @@ import json
 import time
 import os
 import io
+import sys
 
 app = Microdot()
 
@@ -82,6 +83,16 @@ async def qrCode(req):
 @app.get('/github-icon')
 async def githubIcon(req):
     return send_file('/static/img/git-hub-img.svg')
+
+@app.get('/log')
+async def log_view(req):
+    global log_file
+    log_file.flush()
+    
+#     return send_file('/log.txt')
+    f = open('/log.txt')
+    return "<pre>{}</pre>".format(f.read())
+
 
 
 @app.route("/heater_on")
@@ -160,9 +171,10 @@ def save_settings(mode):
     file.close()
 
 def log(msg):
+    global log_file
     now = time.localtime()
-    print("{}-{}-{} {}:{}:{} {}".format(now[2], now[1], now[0], now[3], now[4], now[5], msg))
-
+    print("[{}-{}-{} {}:{}:{}] {}".format(now[2], now[1], now[0], now[3], now[4], now[5], msg))
+   
 async def tray_rotator():
     while True:
         motor.value(1)
@@ -291,5 +303,5 @@ try:
     loop.run_forever()
 finally:
     log_file.close()
-
+    os.dupterm(None)
 

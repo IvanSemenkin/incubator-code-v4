@@ -1,10 +1,8 @@
-{% args temp, hum, mode, on_off_motor %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="refresh" content="2">
     <title>1</title>
     <link rel="stylesheet" href="/css" />
     <script src="/js" defer></script>
@@ -20,30 +18,35 @@
           Температура
           <a href="/heater_on"><button class="list-button">Включить подогрев</button></a>
           <a href="/heater_off"><button class="list-button">Выключить</button></a>
-          <span>{{ temp }} &deg</span>
+          <span id="temp"></span>
         </li>
         <li>
           Влажность
           <a href="/fan_on"><button class="list-button">Включить вентилятор</button></a>
           <a href="/fan_off"><button class="list-button">Выключить</button></a>
-          <span>{{ hum }}%</span>
+          <span id="hum"></span>
         </li>
         <li>
           Режимы
           <a href="/mode_1"><button class="list-button" id="first-mode">1 режим</button></a>
           <a href="/mode_2"><button class="list-button" id="second-mode">2 режим</button></a>
           <a href="/mode_3"><button class="list-button" id="therd-mode">3 режим</button></a>
-          <span id="mode">{{ mode }}</span>
+          <span id="mode"></span>
         </li>
         <li>
           Переворот яиц
           <a href="/motor_on"><button class="list-button">Включить</button></a>
           <a href="/motor_off"><button class="list-button">Выключить</button></a>
-          <span>{{ on_off_motor }}</span>
+          <span></span>
+        </li>
+        <li class="log-btn">
+          Логи
+          <a href="/log"><button class="list-button">На страничку слогами</button></a>
         </li>
       </ul>
       <a href="https://github.com/IvanSemenkin/incubator-code-v4" target="_blank"><img id="qr-code" src="/qr-code" width="164" height="164" border="0" title="QR код"></a>
       <a class="git-hub-img" href="https://github.com/IvanSemenkin/incubator-code-v4"><img src="/github-icon" alt=""></a>
+     <p></p>
     </div>
     </div>
   </body>

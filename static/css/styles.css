@@ -160,6 +160,9 @@ textarea::-webkit-resizer {
   scale: 140%;
 }
 
+.log-btn{
+    display: block;
+}
 @media (max-width: 768px) {
   .fancy-list {
     width: 90%;
@@ -210,4 +213,7 @@ textarea::-webkit-resizer {
   li {
     margin: 10px;
   }
+  .log-btn{
+    display: none;
+}
 }
