@@ -18,38 +18,31 @@ import io
 
 app = Microdot()
 
-def init():
-    global mode, display, f, line
-    class logToFile(io.IOBase):
-        def __init__(self):
-            pass
-
-        def write(self, data):
-            with open("log.txt", mode="a") as f:
-                f.write(data)
-            return len(data)
-    # Begin loging to file
-    os.dupterm(logToFile())
-    
-    
+def init():    
         
+    os.dupterm(log_file)
     display.text('Starting...', 0, 0, 1)
     try:
         file = open("config.json","r")
         config = json.loads(file.read())
-        print('config = ', config)
+        log('config = ' + config)
         mode = config['mode']
     except:
         mode = 1
     else:
         file.close()
     set_mode(mode)
+    
+    
+    
     display.fill(0)
+    Response.default_content_type = 'text/html'
+
 
 async def init_network():
     global ip_addr, mode, ssid
     
-    ssid = 'HIPPO'
+    ssid = 'HIPPOPOX'
     password = '8abcdef892'
 
 
@@ -58,23 +51,20 @@ async def init_network():
     wlan.disconnect()
     if not wlan.isconnected():
         wlan.connect(ssid, password)
-        print("Waiting for connection...")
+        log("Waiting for connection...")
         display.fill_rect(0, 0, 128, 11, 0)
         display.text('Connecting...', 0, 0, 1)
         while not wlan.isconnected():
             await uasyncio.sleep(3)
             
     ip_addr = wlan.ifconfig()[0]
-    print('Подключено к Wi-Fi. Веб-интерфейс: http://' + ip_addr + ':5000')
+    log('Подключено к Wi-Fi. Веб-интерфейс: http://' + ip_addr + ':5000')
     display.fill_rect(0, 0, 128, 11, 0)
 
-Response.default_content_type = 'text/html'
-
-temp = "1"
-
+### Route handling
 @app.get('/')
 async def index(req):
-    return Template('index.html').render(temp=sensor.temperature(), hum=humidity, mode=mode, on_off_motor=on_off_dict[motor.value()])
+    return Template('index.html').render()
 
 
 @app.get('/css')
@@ -94,16 +84,22 @@ async def githubIcon(req):
     return send_file('/static/img/git-hub-img.svg')
 
 
-    
-# Методы (def)
 @app.route("/heater_on")
 def heater_on(request):
     heater.value(1)
-    
+
 # @app.route("/inf1")
 # def inf1(request):
 #     await request.write("HTTP/1.0 302 OK\r\n")
 #     await request.write('Location: https://fermerznaet.com/pticevodstvo/perepela/inkubaciya.html#m5')
+
+@app.get('/json_file')
+def json_file(request):
+    return {
+            "temp": temperature,
+            "hum": humidity,
+            "mode": mode
+           }
     
 @app.route("/heater_off")
 def heater_off(request):
@@ -140,6 +136,8 @@ def fan_off(request):
 def fan_off(request):
     motor.value(0)
 
+### Route handling end
+
 def set_mode(new_mode):
     global mode, target_temperature, target_humidity
     mode = new_mode
@@ -160,14 +158,17 @@ def save_settings(mode):
     file = open("config.json","w")
     file.write(json.dumps({'mode': mode}))
     file.close()
-    
+
+def log(msg):
+    now = time.localtime()
+    print("{}-{}-{} {}:{}:{} {}".format(now[2], now[1], now[0], now[3], now[4], now[5], msg))
 
 async def tray_rotator():
     while True:
         motor.value(1)
-        await uasyncio.sleep(60) 
+        await uasyncio.sleep(30) 
         motor.value(0)
-        await uasyncio.sleep(60)
+        await uasyncio.sleep(180)
 #     if mode == 1:
 #         while True:
 #             motor.value(1)
@@ -202,7 +203,7 @@ async def cooling():
 
 async def thermostat():
     global temperature, humidity, mode, ip_addr
-    print("thermostat is running")
+    log("thermostat is running")
     start_time = time.time()
     while True:
         if not cooling_mode:  
@@ -214,7 +215,7 @@ async def thermostat():
                 sensor.measure()
                 temperature = sensor.temperature()
                 humidity = sensor.humidity()
-                print("Ошибка датчика")
+                log("Ошибка датчика")
             if temperature >= target_temperature:
                 heater.value(0)
             elif temperature < target_temperature:
@@ -223,24 +224,27 @@ async def thermostat():
                 fan.value(1)
             elif humidity < target_humidity - delta_humidity:
                 fan.value(0)
-            print(humidity, "- hum")
+            log('temp: ' + str(temperature))
             led.value(not led.value())
             on_off_dict = {1: "ON", 0: "OFF"}
             display.fill_rect(0, 12, 128, 64, 0) 
             display.text('Heat: {heat}, {temp}C'.format(heat = on_off_dict[heater.value()], temp = temperature), 0, 16, 1)
             display.text('Fan: {fan}, {hum}%'.format(fan = on_off_dict[fan.value()], hum = humidity), 0, 28, 1)
             display.text('M{mode}: {temp}C, {hum}%'.format(mode = mode, temp = target_temperature, hum = target_humidity) , 0, 40, 1)
-            
             display.text(ip_addr, 0, 52, 1)
-            display.show()        
-            await uasyncio.sleep(2)                
+            
+            try:
+                display.show()
+            except:
+                log('display error')
+                
+            await uasyncio.sleep(2)
 
 
 
 led = Pin(2, Pin.OUT)
 ssid = "HIPPO"
 sensor = dht.DHT22(Pin(25))
-print(sensor.temperature())
 heater = Pin(27, Pin.OUT)
 fan = Pin(26, Pin.OUT)
 motor = Pin(18, Pin.OUT)
@@ -270,6 +274,8 @@ led.value(1)
 
 led.value(0)
 
+log_file = open("log.txt", "w")
+
 init()
 
 
@@ -280,9 +286,10 @@ loop.create_task(cooling())
 loop.create_task(thermostat())
 loop.create_task(tray_rotator())
 
+
 try:
     loop.run_forever()
 finally:
-    pass
+    log_file.close()
 
 
