@@ -151,8 +151,8 @@ textarea::-webkit-resizer {
   display: block;
   position: fixed;
   bottom: 50px;
-  left: 100px;
   scale: 130%;
+  left: 50px;
   transition: 0.4s ease;
 }
 
@@ -160,9 +160,22 @@ textarea::-webkit-resizer {
   scale: 140%;
 }
 
-.log-btn{
-    display: block;
+.img_chick {
+  scale: 60%;
+  position: absolute;
+  bottom: 300px;
+  left: 10px;
+  transition: 0.4s ease;
 }
+
+.img_chick:hover {
+  scale: 65%;
+}
+
+.log-btn {
+  display: block;
+}
+
 @media (max-width: 768px) {
   .fancy-list {
     width: 90%;
@@ -213,7 +226,19 @@ textarea::-webkit-resizer {
   li {
     margin: 10px;
   }
-  .log-btn{
+
+  .log-btn {
     display: none;
-}
+  }
+
+  .img_chick {
+    scale: 20%;
+    position: absolute;
+    left: auto;
+    right: auto;
+    bottom: 0px;
+  }
+  .img_chick:hover {
+    scale: 21%
+  }
 }

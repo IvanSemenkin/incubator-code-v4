@@ -9,7 +9,7 @@ from machine import Pin
 import machine
 from time import sleep
 import dht
-from machine import Pin, I2C
+from machine import Pin, SoftI2C
 import ssd1306
 import json
 import time
@@ -22,6 +22,7 @@ app = Microdot()
 def init():    
         
     os.dupterm(log_file)
+    display.rotate(False)
     display.text('Starting...', 0, 0, 1)
     try:
         file = open("config.json","r")
@@ -70,19 +71,33 @@ async def index(req):
 
 @app.get('/css')
 async def css(req):
-    return send_file('/static/css/styles.css')
+    response = send_file('/static/css/styles.css')
+    response.headers['Cache-Control'] = 'public, max-age=14400' 
+    return response
 
 @app.get('/js')
 async def js(req):
-    return send_file('/static/js/main.js')
+    response = send_file('/static/js/main.js')
+    response.headers['Cache-Control'] = 'public, max-age=14400' 
+    return response
 
 @app.get('/qr-code')
 async def qrCode(req):
-    return send_file('/static/img/qr-code.png')
+    response = send_file('/static/img/qr-code.png')
+    response.headers['Cache-Control'] = 'public, max-age=14400' 
+    return response
 
 @app.get('/github-icon')
 async def githubIcon(req):
-    return send_file('/static/img/git-hub-img.svg')
+    response = send_file('/static/img/git-hub-img.png')
+    response.headers['Cache-Control'] = 'public, max-age=14400' 
+    return response
+
+@app.get('/chick-icon')
+async def chickIcon(req):
+    response = send_file('/static/img/cyplenok-color.jpg')
+    response.headers['Cache-Control'] = 'public, max-age=14400' 
+    return response
 
 @app.get('/log')
 async def log_view(req):
@@ -91,7 +106,7 @@ async def log_view(req):
     
 #     return send_file('/log.txt')
     f = open('/log.txt')
-    return "<pre>{}</pre>".format(f.read())
+    return "<pre>{}</pre> <a href='/'>← Назад</a>".format(f.read())
 
 
 
@@ -260,7 +275,7 @@ sensor = dht.DHT22(Pin(25))
 heater = Pin(27, Pin.OUT)
 fan = Pin(26, Pin.OUT)
 motor = Pin(18, Pin.OUT)
-display = ssd1306.SSD1306_I2C(128, 64, I2C(sda=Pin(23), scl=Pin(22)))
+display = ssd1306.SSD1306_I2C(128, 64, SoftI2C(sda=Pin(23), scl=Pin(22)))
 
 mode = 1
 target_temperature = 37.8
@@ -278,7 +293,7 @@ humidity = 0
 temperature = 0
 ip_addr = ''
 on_off_dict = {1: "ON", 0: "OFF"}
-
+image_cache = {}
 
 led.value(1)
 #wait hardware init after hard reset
@@ -304,4 +319,5 @@ try:
 finally:
     log_file.close()
     os.dupterm(None)
+    app.shutdown()
 

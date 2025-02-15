@@ -1,15 +1,17 @@
-const themeToggle = document.getElementById('theme-toggle');
-const dotsContainer = document.getElementById('dots-container');
-const mode = document.getElementById('mode')
-const modeButtonFirst = document.getElementById('first-mode')
-const modeButtonSecond = document.getElementById('second-mode')
-const modeButtonTherd = document.getElementById('therd-mode')
-const spanMode = document.getElementById('span-mode')
+const themeToggle = document.getElementById("theme-toggle");
+const dotsContainer = document.getElementById("dots-container");
+const mode = document.getElementById("mode");
+const temp = document.getElementById("temp");
+const hum = document.getElementById("hum");
+const modeButtonFirst = document.getElementById("first-mode");
+const modeButtonSecond = document.getElementById("second-mode");
+const modeButtonTherd = document.getElementById("therd-mode");
+const spanMode = document.getElementById("span-mode");
 
-themeToggle.addEventListener('click', () => {
-  document.body.classList.toggle('dark');
-  const isDark = document.body.classList.contains('dark');
-  themeToggle.textContent = isDark ? 'Светлая тема' : 'Темная тема';
+themeToggle.addEventListener("click", () => {
+  document.body.classList.toggle("dark");
+  const isDark = document.body.classList.contains("dark");
+  themeToggle.textContent = isDark ? "Светлая тема" : "Темная тема";
 
   if (isDark) {
     generateRandomDots();
@@ -18,17 +20,15 @@ themeToggle.addEventListener('click', () => {
   }
 });
 
-
 function generateRandomDots() {
-  clearDots(); 
+  clearDots();
   const numDots = 20;
   const containerWidth = window.innerWidth;
   const containerHeight = window.innerHeight;
 
   for (let i = 0; i < numDots; i++) {
-    const dot = document.createElement('div');
-    dot.classList.add('dot');
-
+    const dot = document.createElement("div");
+    dot.classList.add("dot");
 
     const randomX = Math.random() * containerWidth;
     const randomY = Math.random() * containerHeight;
@@ -40,28 +40,37 @@ function generateRandomDots() {
   }
 }
 
-
 function clearDots() {
-  dotsContainer.innerHTML = '';
+  dotsContainer.innerHTML = "";
 }
 
-if (mode.textContent == '1') {
-  modeButtonFirst.className = 'active-button';
-  modeButtonSecond.className = 'list-button';
-  modeButtonTherd.className = 'list-button';
-}if (mode.textContent == '2') {
-  modeButtonFirst.className = 'list-button';
-  modeButtonSecond.className = 'active-button';
-  modeButtonTherd.className = 'list-button';
-}if (mode.textContent == 3) {
-  modeButtonFirst.className = 'list-button';
-  modeButtonSecond.className = 'list-button';
-  modeButtonTherd.className = 'active-button';
-} 
-mode.value = ''
 
-while (True) {
-  setTimeout(() => {
-    location.reload();
-  }, 2000);
+async function json() {
+  let response = await fetch("/json_file");
+  res = await response.json()
+  console.log(res.temp + ' - temp');
+  console.log(res.hum + ' - hum');
+  console.log(res.mode + ' - mode');
+
+  mode.textContent = res.mode
+  temp.textContent = res.temp + "°"
+  hum.textContent = res.hum + "%"
+
+  if (mode.textContent == 1) {
+    modeButtonFirst.className = "active-button";
+    modeButtonSecond.className = "list-button";
+    modeButtonTherd.className = "list-button";
+  }
+  if (mode.textContent == 2) {
+    modeButtonFirst.className = "list-button";
+    modeButtonSecond.className = "active-button";
+    modeButtonTherd.className = "list-button";
+  }
+  if (mode.textContent == 3) {
+    modeButtonFirst.className = "list-button";
+    modeButtonSecond.className = "list-button";
+    modeButtonTherd.className = "active-button";
+  }
 }
+
+setInterval(json, 1000)
