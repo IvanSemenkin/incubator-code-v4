@@ -232,13 +232,6 @@ textarea::-webkit-resizer {
   }
 
   .img_chick {
-    scale: 20%;
-    position: absolute;
-    left: auto;
-    right: auto;
-    bottom: 0px;
-  }
-  .img_chick:hover {
-    scale: 21%
+    display: none;
   }
 }

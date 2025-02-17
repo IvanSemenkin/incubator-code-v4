@@ -7,6 +7,7 @@ const modeButtonFirst = document.getElementById("first-mode");
 const modeButtonSecond = document.getElementById("second-mode");
 const modeButtonTherd = document.getElementById("therd-mode");
 const spanMode = document.getElementById("span-mode");
+const motorStat = document.getElementById("motor_stat");
 
 themeToggle.addEventListener("click", () => {
   document.body.classList.toggle("dark");
@@ -51,10 +52,12 @@ async function json() {
   console.log(res.temp + ' - temp');
   console.log(res.hum + ' - hum');
   console.log(res.mode + ' - mode');
+  console.log(res.motor_stat + ' - motor_stat');
 
   mode.textContent = res.mode
   temp.textContent = res.temp + "°"
-  hum.textContent = res.hum + "%"
+  hum.textContent = res.hum + "%" 
+  motorStat.textContent = res.motor_stat
 
   if (mode.textContent == 1) {
     modeButtonFirst.className = "active-button";

@@ -41,7 +41,7 @@ def init():
 
 async def init_network():
     global ip_addr, mode, ssid
-    ssid = 'HIPPOPOX'
+    ssid = 'HIPPO'
     password = '8abcdef892'
     
     wlan = network.WLAN(network.STA_IF)
@@ -112,7 +112,8 @@ def json_file(request):
     return {
             "temp": temperature,
             "hum": humidity,
-            "mode": mode
+            "mode": mode,
+            "motor_stat": on_off_dict[motor.value()],
            }
 
 @app.route("/heater_off")
