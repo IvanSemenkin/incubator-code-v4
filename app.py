@@ -153,6 +153,30 @@ def motor_off(request):
 
 ### Route handling end
 
+async def overheat():
+    print("overheat run", temperature)
+    while True:
+        if temperature > 38.5:
+            if overheat_start_time is None:
+                overheat_start_time = time.time()
+                log("начало перегрева")# Запоминаем время начала перегрева
+            else:
+                elapsed_time = time.time() - overheat_start_time
+                print("Перегрев повторился!!!")
+                if elapsed_time >= 300:
+                    log("Внимание! Перегрев! Температура выше 38°C более 10 минут.")
+                    overheat_start_time = None  # Сброс времени после вывода сообщения
+                    await uasyncio.sleep(7200)
+                    fan.value(1)
+                    cooling_mode = True
+                    await uasyncio.sleep(600)
+                    fan.value(0)
+                    cooling_mode = False
+        else:
+            overheat_start_time = None
+            log("Перегрева нет")
+        await uasyncio.sleep(2)
+
 def set_mode(new_mode):
     global mode, target_temperature, target_humidity
     mode = new_mode
@@ -279,6 +303,7 @@ loop.create_task(init_network())
 loop.create_task(app.start_server())
 loop.create_task(cooling())
 loop.create_task(thermostat())
+loop.create_task(overheat())
 loop.create_task(tray_rotator())
 
 try:
