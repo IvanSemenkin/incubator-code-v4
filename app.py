@@ -63,7 +63,7 @@ async def init_network():
 ### Route handling
 
 @app.get('/')
-async def index(req):
+async def index(request):
     return Template('index.html').render()
 
 @app.get('/css')
@@ -154,28 +154,36 @@ def motor_off(request):
 ### Route handling end
 
 async def overheat():
+    global overheat_mode
     print("overheat run", temperature)
     while True:
-        if temperature > 38.5:
+        if temperature > 23:
             if overheat_start_time is None:
                 overheat_start_time = time.time()
                 log("начало перегрева")# Запоминаем время начала перегрева
             else:
                 elapsed_time = time.time() - overheat_start_time
-                print("Перегрев повторился!!!")
-                if elapsed_time >= 300:
-                    log("Внимание! Перегрев! Температура выше 38°C более 10 минут.")
-                    overheat_start_time = None  # Сброс времени после вывода сообщения
-                    await uasyncio.sleep(7200)
-                    fan.value(1)
-                    cooling_mode = True
-                    await uasyncio.sleep(600)
-                    fan.value(0)
-                    cooling_mode = False
+                log("Перегрев повторился!!!")
+                if elapsed_time >= 4:
+                    while temperature > 23:
+                        display.text('OVERHEAT!', 0, 0, 1)
+                        display.show()
+                        log("Внимание! Перегрев! Температура выше 38°C более 10 минут.")   
+                        display.invert(1)
+                        motor.value(1)
+                        await uasyncio.sleep(10)
+                        display.invert(0)
+                        await uasyncio.sleep(2)
+                            
         else:
             overheat_start_time = None
             log("Перегрева нет")
-        await uasyncio.sleep(2)
+            motor.value(0)
+            display.fill_rect(0, 0, 128, 10, 0)
+            display.show()
+        await uasyncio.sleep(10)
+
+
 
 def set_mode(new_mode):
     global mode, target_temperature, target_humidity
@@ -287,7 +295,7 @@ seven_days1 = 10
 forteen_days1 = 20
 seven_days = 7 * 24 * 60 * 60
 forteen_days = 14 * 24 * 60 * 60
-
+overheat_mode = False
 humidity = 0
 temperature = 0
 ip_addr = ''
