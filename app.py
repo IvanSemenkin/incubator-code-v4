@@ -63,8 +63,17 @@ async def init_network():
 ### Route handling
 
 @app.get('/')
+async def index(req):
+    return Template('index.html').render()
+### Route handling
+
+@app.get('/')
 async def index(request):
     return Template('index.html').render()
+
+@app.get('/settings')
+async def index(request):
+    return Template('settings.html').render()
 
 @app.get('/css')
 async def css(req):
@@ -75,6 +84,12 @@ async def css(req):
 @app.get('/js')
 async def js(req):
     response = send_file('/static/js/main.js')
+    response.headers['Cache-Control'] = 'public, max-age=14400'
+    return response
+
+@app.get('/settings_js')
+async def settings_js(req):
+    response = send_file('/static/js/settings.js')
     response.headers['Cache-Control'] = 'public, max-age=14400'
     return response
 
@@ -114,6 +129,8 @@ def json_file(request):
             "hum": humidity,
             "mode": mode,
             "motor_stat": on_off_dict[motor.value()],
+            "heater_stat": on_off_dict[heater.value()],
+            "fan_stat": on_off_dict[fan.value()],
            }
 
 @app.route("/heater_off")
@@ -153,35 +170,34 @@ def motor_off(request):
 
 ### Route handling end
 
-async def overheat():
-    global overheat_mode
-    print("overheat run", temperature)
-    while True:
-        if temperature > 23:
-            if overheat_start_time is None:
-                overheat_start_time = time.time()
-                log("начало перегрева")# Запоминаем время начала перегрева
-            else:
-                elapsed_time = time.time() - overheat_start_time
-                log("Перегрев повторился!!!")
-                if elapsed_time >= 4:
-                    while temperature > 23:
-                        display.text('OVERHEAT!', 0, 0, 1)
-                        display.show()
-                        log("Внимание! Перегрев! Температура выше 38°C более 10 минут.")   
-                        display.invert(1)
-                        motor.value(1)
-                        await uasyncio.sleep(10)
-                        display.invert(0)
-                        await uasyncio.sleep(2)
-                            
-        else:
-            overheat_start_time = None
-            log("Перегрева нет")
-            motor.value(0)
-            display.fill_rect(0, 0, 128, 10, 0)
-            display.show()
-        await uasyncio.sleep(10)
+# async def overheat():
+#     global overheat_mode
+#     log("overheat run, temp: {}".format(temperature))
+#     while True:
+#         if temperature > 38.4:
+#             if overheat_start_time is None:
+#                 overheat_start_time = time.time()
+#                 log("начало перегрева")# Запоминаем время начала перегрева
+#             else:
+#                 elapsed_time = time.time() - overheat_start_time
+#                 log("Перегрев повторился!!!")
+#                 if elapsed_time >= 300:
+#                     while temperature > 38.4:
+#                         display.text('OVERHEAT!', 0, 0, 1)
+#                         display.show()
+#                         log("Внимание! Перегрев! Температура выше 38°C более 5 минут.")   
+#                         display.invert(1)
+#                         motor.value(1)
+#                         await uasyncio.sleep(10)
+#                         display.invert(0)
+#                         await uasyncio.sleep(2)
+#                         display.fill_rect(0, 0, 128, 10, 0)
+#                         display.show()
+#                         motor.value(0)
+#         else:
+#             overheat_start_time = None
+#             log("Перегрева нет")
+#         await uasyncio.sleep(10)
 
 
 
@@ -311,7 +327,7 @@ loop.create_task(init_network())
 loop.create_task(app.start_server())
 loop.create_task(cooling())
 loop.create_task(thermostat())
-loop.create_task(overheat())
+# loop.create_task(overheat())
 loop.create_task(tray_rotator())
 
 try:

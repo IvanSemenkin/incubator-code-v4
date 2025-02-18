@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Settings</title>
+    <link rel="stylesheet" href="/css" />
+    <script src="/settings_js" defer></script>
+  </head>
+  <body>
+    <header class="main-header">
+        <nav class="nav-bar">
+          <ul class="nav-list">
+            <li><a href="/" class="nav-link"><button class="nav-button">Главная</button></a></li>
+            <li><a href="/settings" class="nav-link"><button class="nav-button">Настройки</button></a></li>
+            <li><a href="/log" class="nav-link"><button class="nav-button">Логи</button></a></li>
+          </ul>
+          <button class="menu-toggle" id="menu-toggle">&#9776;</button>
+        </nav>
+      </header>
+    <div class="container">
+      <ul class="fancy-list">
+        <li>
+          Подогрев
+          <a href="/heater_on"><button class="list-button">Включить</button></a>
+          <a href="/heater_off"
+            ><button class="list-button">Выключить</button></a
+          >
+          <span id="temp"></span>
+        </li>
+        <li>
+          Вентилятор
+          <a href="/fan_on"><button class="list-button">Включить</button></a>
+          <a href="/fan_off"><button class="list-button">Выключить</button></a>
+          <span id="hum"></span>
+        </li>
+        <li>
+          Переворот яиц
+          <a href="/motor_on"><button class="list-button">Включить</button></a>
+          <a href="/motor_off"
+            ><button class="list-button">Выключить</button></a
+          >
+          <span id="motor_stat"></span>
+        </li>
+      </ul>
+    </div>
+  </body>
+</html>

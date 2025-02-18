@@ -11,7 +11,7 @@
 .fancy-list li {
   background: linear-gradient(135deg, #6a5acd, #836fff);
   color: #fff;
-  padding: 15px 25px;
+  padding: 28px 35px;
   border-radius: 10px;
   font-size: 1.2rem;
   text-align: center;
@@ -88,6 +88,27 @@ body.dark .list-button:hover {
   transform: scale(1.1);
 }
 
+.nav-button {
+  background-color: #6a5acd;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1.2rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+  margin: 10px;
+  display: block;
+  width: 150px; /* Задаем одинаковую ширину */
+  text-align: center;
+  border: silver solid 2px;
+}
+
+.nav-button:hover {
+  background-color: #836fff;
+  transform: scale(1.1);
+}
+
 #dots-container {
   position: fixed;
   top: 0;
@@ -126,23 +147,6 @@ span {
   background-color: #6a5acd;
   color: #fff;
 }
-
-textarea {
-  border-radius: 10px;
-  background-color: #fff;
-  transition: 0.3s ease;
-  padding: 15px;
-  width: 100px;
-  height: 70px;
-}
-textarea:hover {
-  background-color: #8b76ff;
-  color: #fff;
-}
-
-textarea::-webkit-resizer {
-  display: none;
-}
 .git-hub-img {
   display: none;
 }
@@ -174,6 +178,62 @@ textarea::-webkit-resizer {
 
 .log-btn {
   display: block;
+}
+
+.main-header {
+  background: linear-gradient(135deg, #6a5acd, #836fff);
+  padding: 15px;
+  width: 50%;
+  text-align: center;
+  border-radius: 10px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.nav-bar {
+
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.nav-list {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  border-radius: 10px;
+  gap: 10px;
+}
+
+
+.nav-list li {
+  margin: 0;
+  padding: 10px;
+  width: auto;
+  border-radius: 10px;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: #fff;
+  font-size: 1.2rem;
+  transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #ffd700;
+}
+
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #fff;
+  cursor: pointer;
 }
 
 @media (max-width: 768px) {
@@ -224,7 +284,8 @@ textarea::-webkit-resizer {
   }
 
   li {
-    margin: 10px;
+    margin: 20px;
+    padding: 100px;
   }
 
   .log-btn {
@@ -233,5 +294,40 @@ textarea::-webkit-resizer {
 
   .img_chick {
     display: none;
+  }
+
+  .nav-list {
+    display: flex;
+    flex-direction: column;
+    background: #6a5acd;
+    width: 50%;
+    position: absolute;
+    top: 50px;
+    left: 0;
+    text-align: center;
+    margin: 20px; 
+    background-color: #5143ac;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease-in-out, padding 0.4s ease-in-out;
+    padding: 0;
+  }
+
+  .nav-list.active {
+    display: flex;
+    width: 50%;
+    margin: 20px; 
+    background-color: #5143ac;
+    max-height: 300px; /* Достаточно, чтобы уместить все элементы */
+    padding: 10px 0;
+  }
+  .nav-list .nav-button {
+    border: silver solid 2px;
+  }
+  .menu-toggle {
+    display: block;
+  }
+  .main-header{
+    width: 83%;
   }
 }

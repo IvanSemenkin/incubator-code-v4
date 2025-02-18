@@ -1,53 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>1</title>
-    <link rel="stylesheet" href="/css" />
-    <script src="/js" defer></script>
-  </head>
-  <body>
-    <div class="container">
-      <div class="theme-switcher">
-        <button id="theme-toggle" class="theme-button">Переключить тему</button>
-      </div>
-      <div id="dots-container"></div>
-      <ul class="fancy-list">
-        <li>
-          Температура
-          <a href="/heater_on"><button class="list-button">Включить подогрев</button></a>
-          <a href="/heater_off"><button class="list-button">Выключить</button></a>
-          <span id="temp"></span>
-        </li>
-        <li>
-          Влажность
-          <a href="/fan_on"><button class="list-button">Включить вентилятор</button></a>
-          <a href="/fan_off"><button class="list-button">Выключить</button></a>
-          <span id="hum"></span>
-        </li>
-        <li>
-          Режимы
-          <a href="/mode_1"><button class="list-button" id="first-mode">1 режим</button></a>
-          <a href="/mode_2"><button class="list-button" id="second-mode">2 режим</button></a>
-          <a href="/mode_3"><button class="list-button" id="therd-mode">3 режим</button></a>
-          <span id="mode"></span>
-        </li>
-        <li>
-          Переворот яиц
-          <a href="/motor_on"><button class="list-button">Включить</button></a>
-          <a href="/motor_off"><button class="list-button">Выключить</button></a>
-          <span id="motor_stat"></span>
-        </li>
-        <li class="log-btn">
-          Логи
-          <a href="/log"><button class="list-button">На страничку слогами</button></a>
-        </li>
-      </ul>	
-      <a href="https://github.com/IvanSemenkin/incubator-code-v4" target="_blank"><img id="qr-code" src="/qr-code" width="164" height="164" border="0" title="QR код"></a>
-      <a class="git-hub-img" href="https://github.com/IvanSemenkin/incubator-code-v4"><img src="/github-icon" alt=""></a>
-      <a href="https://fermerznaet.com/pticevodstvo/perepela/inkubaciya.html#m5" target="_blank"><img src="/chick-icon" class="img_chick" alt="цыпа"></a>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>1</title>
+  <link rel="stylesheet" href="/css" />
+  <script src="/js" defer></script>
+</head>
+<body>
+  <header class="main-header">
+    <nav class="nav-bar">
+      <ul class="nav-list">
+        <li><a href="/" class="nav-link"><button class="nav-button">Главная</button></a></li>
+        <li><a href="/settings" class="nav-link"><button class="nav-button">Настройки</button></a></li>
+        <li><a href="/log" class="nav-link"><button class="nav-button">Логи</button></a></li>
+      </ul>
+      <button class="menu-toggle" id="menu-toggle">&#9776;</button>
+    </nav>
+  </header>
+  <div class="container">
+    <div class="theme-switcher">
+      <button id="theme-toggle" class="theme-button">Переключить тему</button>
     </div>
-    </div>
-  </body>
+    <div id="dots-container"></div>
+    <ul class="fancy-list">
+      <li>
+        Температура
+        <span id="temp"></span>
+      </li>
+      <li>
+        Влажность
+        <span id="hum"></span>
+      </li>
+      <li>
+        Режимы
+        <a href="/mode_1"><button class="list-button" id="first-mode">1 режим</button></a>
+        <a href="/mode_2"><button class="list-button" id="second-mode">2 режим</button></a>
+        <a href="/mode_3"><button class="list-button" id="therd-mode">3 режим</button></a>
+      </li>
+      <li>
+        Переворот яиц
+        <a href="/motor_on"><button class="list-button">Включить</button></a>
+        <a href="/motor_off"><button class="list-button">Выключить</button></a>
+        <span id="motor_stat"></span>
+      </li>
+    </ul>
+    <a href="https://github.com/IvanSemenkin/incubator-code-v4" target="_blank"><img id="qr-code" src="/qr-code"
+        width="164" height="164" border="0" title="QR код"></a>
+    <a class="git-hub-img" href="https://github.com/IvanSemenkin/incubator-code-v4"><img src="/github-icon" alt=""></a>
+    <a href="https://fermerznaet.com/pticevodstvo/perepela/inkubaciya.html#m5" target="_blank"><img src="/chick-icon"
+        class="img_chick" alt="цыпа"></a>
+  </div>
+  </div>
+</body>
+
 </html>
