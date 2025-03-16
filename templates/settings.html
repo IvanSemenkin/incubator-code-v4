@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Settings</title>
-    <link rel="stylesheet" href="/css" />
-    <script src="/settings_js" defer></script>
+    <link rel="stylesheet" href="/static/css/styles.css" />
+    <script src="/static/js/settings.js" defer></script>
   </head>
   <body>
     <header class="main-header">
@@ -22,22 +22,22 @@
       <ul class="fancy-list">
         <li>
           Подогрев
-          <a href="/heater_on"><button class="list-button">Включить</button></a>
-          <a href="/heater_off"
+          <a href="/heater/1"><button class="list-button">Включить</button></a>
+          <a href="/heater/0"
             ><button class="list-button">Выключить</button></a
           >
           <span id="temp"></span>
         </li>
         <li>
           Вентилятор
-          <a href="/fan_on"><button class="list-button">Включить</button></a>
-          <a href="/fan_off"><button class="list-button">Выключить</button></a>
+          <a href="/fan/1"><button class="list-button">Включить</button></a>
+          <a href="/fan/0"><button class="list-button">Выключить</button></a>
           <span id="hum"></span>
         </li>
         <li>
           Переворот яиц
-          <a href="/motor_on"><button class="list-button">Включить</button></a>
-          <a href="/motor_off"
+          <a href="/motor/1"><button class="list-button">Включить</button></a>
+          <a href="/motor/0"
             ><button class="list-button">Выключить</button></a
           >
           <span id="motor_stat"></span>

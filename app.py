@@ -111,14 +111,6 @@ async def change_heater(request, id):
 async def change_motor(request, id):
     motor.value(id)
 
-
-# @app.route("/motor_on")
-# def motor_on(request):
-#     motor.value(1)
-# 
-# @app.route("/motor_off")
-# def motor_off(request):
-#     motor.value(0)
     
 ### Route handling end
 def set_mode(new_mode):
