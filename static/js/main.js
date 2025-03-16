@@ -53,26 +53,24 @@ function clearDots() {
   dotsContainer.innerHTML = "";
 }
 
-
 async function json() {
-  let response = await fetch("/json_file");
-  res = await response.json()
-  console.log(res.temp + ' - temp');
-  console.log(res.hum + ' - hum');
-  console.log(res.mode + ' - mode');
-  console.log(res.motor_stat + ' - motor_stat');
-  console.log(res.heater_stat + ' - heater_stat');
-  console.log(res.fan_stat + ' - fan_stat');
+  let response = await fetch("/api/data");
+  res = await response.json();
+  console.log(res.temp + " - temp");
+  console.log(res.hum + " - hum");
+  console.log(res.mode + " - mode");
+  console.log(res.motor_stat + " - motor_stat");
+  console.log(res.heater_stat + " - heater_stat");
+  console.log(res.fan_stat + " - fan_stat");
 
-  temp.textContent = res.temp + "° " + res.heater_stat
-  hum.textContent = res.hum + "% " + res.fan_stat
-  motorStat.textContent = res.motor_stat
+  temp.textContent = res.temp + "° " + res.heater_stat;
+  hum.textContent = res.hum + "% " + res.fan_stat;
+  motorStat.textContent = res.motor_stat;
 
   if (res.mode == 1) {
     modeButtonFirst.className = "active-button";
     modeButtonSecond.className = "list-button";
     modeButtonTherd.className = "list-button";
-
   }
   if (res.mode == 2) {
     modeButtonFirst.className = "list-button";
@@ -86,4 +84,4 @@ async function json() {
   }
 }
 
-setInterval(json, 1000)
+setInterval(json, 1000);

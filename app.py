@@ -1,21 +1,25 @@
+import uasyncio as asyncio
+
 import network
-from microdot import Microdot, send_file
-from microdot.utemplate import Template
-from microdot import Response
 import time
-import uasyncio
-import network
-from machine import Pin
-import machine
 from time import sleep
-import dht
+
+import machine
 from machine import Pin, SoftI2C
-import ssd1306
-import json
-import time
+from machine import Pin
+
 import os
 import io
 import sys
+import json
+
+from microdot import Microdot, send_file
+from microdot.utemplate import Template
+from microdot import Response
+
+import dht
+import ssd1306
+
 
 app = Microdot()
 
@@ -39,32 +43,22 @@ def init():
     display.fill(0)
     Response.default_content_type = 'text/html'
 
+
 async def init_network():
-    global ip_addr, mode, ssid
+    global ip_addr
     ssid = 'HIPPO'
     password = '8abcdef892'
-    
-    wlan = network.WLAN(network.STA_IF)
+    wlan = network.WLAN(network.WLAN.IF_STA)
     wlan.active(True)
-    wlan.disconnect()
-    
     if not wlan.isconnected():
+        print('connecting to network...')
         wlan.connect(ssid, password)
-        log("Waiting for connection...")
-        display.fill_rect(0, 0, 128, 11, 0)
-        display.text('Connecting...', 0, 0, 1)
         while not wlan.isconnected():
-            await uasyncio.sleep(3)
-            
+            await asyncio.sleep(1)
     ip_addr = wlan.ifconfig()[0]
     log('Подключено к Wi-Fi. Веб-интерфейс: http://' + ip_addr + ':5000')
     display.fill_rect(0, 0, 128, 11, 0)
-
-### Route handling
-
-@app.get('/')
-async def index(req):
-    return Template('index.html').render()
+    
 ### Route handling
 
 @app.get('/')
@@ -75,55 +69,14 @@ async def index(request):
 async def index(request):
     return Template('settings.html').render()
 
-@app.get('/css')
-async def css(req):
-    response = send_file('/static/css/styles.css')
+@app.get('/static/<path:path>')
+async def get_static(request, path):
+    response = send_file('/static/' + path)
     response.headers['Cache-Control'] = 'public, max-age=14400'
     return response
 
-@app.get('/js')
-async def js(req):
-    response = send_file('/static/js/main.js')
-    response.headers['Cache-Control'] = 'public, max-age=14400'
-    return response
-
-@app.get('/settings_js')
-async def settings_js(req):
-    response = send_file('/static/js/settings.js')
-    response.headers['Cache-Control'] = 'public, max-age=14400'
-    return response
-
-@app.get('/qr-code')
-async def qrCode(req):
-    response = send_file('/static/img/qr-code.png')
-    response.headers['Cache-Control'] = 'public, max-age=14400'
-    return response
-
-@app.get('/github-icon')
-async def githubIcon(req):
-    response = send_file('/static/img/git-hub-img.png')
-    response.headers['Cache-Control'] = 'public, max-age=14400'
-    return response
-
-@app.get('/chick-icon')
-async def chickIcon(req):
-    response = send_file('/static/img/cyplenok-color.jpg')
-    response.headers['Cache-Control'] = 'public, max-age=14400'
-    return response
-
-@app.get('/log')
-async def log_view(req):
-    global log_file
-    log_file.flush()
-    f = open('/log.txt')
-    return "<pre>{}</pre> <a href='/'>← Назад</a>".format(f.read())
-
-@app.route("/heater_on")
-def heater_on(request):
-    heater.value(1)
-
-@app.get('/json_file')
-def json_file(request):
+@app.get('/api/data')
+def get_data(request):
     return {
             "temp": temperature,
             "hum": humidity,
@@ -133,74 +86,41 @@ def json_file(request):
             "fan_stat": on_off_dict[fan.value()],
            }
 
-@app.route("/heater_off")
-def heater_off(request):
-    heater.value(0)
+@app.get('/log')
+async def log_view(req):
+    global log_file
+    log_file.flush()
+    f = open('/log.txt')
+    return "<pre>{}</pre> <a href='/'>← Назад</a>".format(f.read())
 
-@app.route("/fan_on")
-def fan_on(request):
-    fan.value(1)
 
-@app.route("/fan_off")
-def fan_off(request):
-    fan.value(0)
+@app.get('/fan/<int:id>')
+async def change_fan(request, id):
+    fan.value(id)
 
-@app.route("/mode_1")
-def mode_1(request):
-    set_mode(1)
+@app.get('/mode/<int:id>')
+async def change_mode(request, id):
+    set_mode(id)
     save_settings(mode)
 
-@app.route("/mode_2")
-def mode_2(request):
-    set_mode(2)
-    save_settings(mode)
+@app.get('/heater/<int:id>')
+async def change_heater(request, id):
+    heater.value(id)
 
-@app.route("/mode_3")
-def mode_3(request):
-    set_mode(3)
-    save_settings(mode)
+@app.get('/motor/<int:id>')
+async def change_motor(request, id):
+    motor.value(id)
 
-@app.route("/motor_on")
-def motor_on(request):
-    motor.value(1)
 
-@app.route("/motor_off")
-def motor_off(request):
-    motor.value(0)
-
+# @app.route("/motor_on")
+# def motor_on(request):
+#     motor.value(1)
+# 
+# @app.route("/motor_off")
+# def motor_off(request):
+#     motor.value(0)
+    
 ### Route handling end
-
-# async def overheat():
-#     global overheat_mode
-#     log("overheat run, temp: {}".format(temperature))
-#     while True:
-#         if temperature > 38.4:
-#             if overheat_start_time is None:
-#                 overheat_start_time = time.time()
-#                 log("начало перегрева")# Запоминаем время начала перегрева
-#             else:
-#                 elapsed_time = time.time() - overheat_start_time
-#                 log("Перегрев повторился!!!")
-#                 if elapsed_time >= 300:
-#                     while temperature > 38.4:
-#                         display.text('OVERHEAT!', 0, 0, 1)
-#                         display.show()
-#                         log("Внимание! Перегрев! Температура выше 38°C более 5 минут.")   
-#                         display.invert(1)
-#                         motor.value(1)
-#                         await uasyncio.sleep(10)
-#                         display.invert(0)
-#                         await uasyncio.sleep(2)
-#                         display.fill_rect(0, 0, 128, 10, 0)
-#                         display.show()
-#                         motor.value(0)
-#         else:
-#             overheat_start_time = None
-#             log("Перегрева нет")
-#         await uasyncio.sleep(10)
-
-
-
 def set_mode(new_mode):
     global mode, target_temperature, target_humidity
     mode = new_mode
@@ -230,24 +150,12 @@ def log(msg):
 async def tray_rotator():
     while True:
         motor.value(1)
-        await uasyncio.sleep(30)
+        await asyncio.sleep(10)
         motor.value(0)
-        await uasyncio.sleep(180)
-
-async def cooling():
-    global cooling_mode
-    cooling_mode = False
-    if mode == 2:
-        while True:
-            await uasyncio.sleep(7200)
-            fan.value(1)
-            cooling_mode = True
-            await uasyncio.sleep(900)
-            fan.value(0)
-            cooling_mode = False
+        await asyncio.sleep(3600)
 
 async def thermostat():
-    global temperature, humidity, mode, ip_addr
+    global temperature, humidity
     log("thermostat is running")
     start_time = time.time()
     while True:
@@ -285,12 +193,15 @@ async def thermostat():
                 display.show()
             except:
                 log('display error')
-            await uasyncio.sleep(2)
+            await asyncio.sleep(2)
             display.pixel(0, 0, 0)
             try:
                 display.show()
             except:
                 log('display error')
+                
+                
+mode = 1
 
 led = Pin(2, Pin.OUT)
 ssid = "HIPPO"
@@ -300,7 +211,10 @@ fan = Pin(26, Pin.OUT)
 motor = Pin(18, Pin.OUT)
 display = ssd1306.SSD1306_I2C(128, 64, SoftI2C(sda=Pin(23), scl=Pin(22)))
 
-mode = 1
+cooling_mode = False
+prev_temperature = None
+prev_humidity = None
+log_file_path = "log.json"
 target_temperature = 37.8
 target_humidity = 53
 delta_temperature = 0.3
@@ -316,18 +230,15 @@ humidity = 0
 temperature = 0
 ip_addr = ''
 on_off_dict = {1: "ON", 0: "OFF"}
-image_cache = {}
 
 log_file = open("log.txt", "w")
 
 init()
 
-loop = uasyncio.get_event_loop()
+loop = asyncio.get_event_loop()
 loop.create_task(init_network())
 loop.create_task(app.start_server())
-loop.create_task(cooling())
 loop.create_task(thermostat())
-# loop.create_task(overheat())
 loop.create_task(tray_rotator())
 
 try:
